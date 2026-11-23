@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>100 Days Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1 id="title">100 Days of Code</h1>
+      <p id="summary" class="summary"></p>
+    </div>
+    <div class="top-buttons">
+      <button id="btn-help" type="button" class="quiet">Help</button>
+      <button id="btn-settings" type="button" class="quiet">Settings</button>
+    </div>
+  </header>
+
+  <!-- Shown only while a session is running. -->
+  <section id="banner" class="banner" hidden>
+    <div class="banner-info">
+      <span id="banner-day"></span>
+      <span id="banner-timer" class="timer">0:00</span>
+      <span id="banner-note" class="note"></span>
+    </div>
+    <div class="banner-buttons">
+      <button id="btn-pause" type="button">Pause</button>
+      <button id="btn-resume" type="button">Resume</button>
+      <button id="btn-stop" type="button" class="primary">Stop</button>
+      <button id="btn-discard" type="button" class="quiet">Discard</button>
+    </div>
+  </section>
+
+  <p id="message" class="message" role="alert" hidden></p>
+
+  <main id="grid" class="grid" aria-label="Course days"></main>
+
+  <section id="stats" class="stats" hidden>
+    <h2>Stats</h2>
+    <dl id="stats-list"></dl>
+  </section>
+
+  <!-- A day: its sessions, Start, Mark complete, add a past session. -->
+  <dialog id="panel" class="panel">
+    <header class="panel-head">
+      <h2 id="panel-title"></h2>
+      <button id="panel-close" type="button" class="quiet" aria-label="Close">&times;</button>
+    </header>
+    <p id="panel-status"></p>
+    <p id="panel-totals"></p>
+    <ul id="panel-sessions" class="sessions"></ul>
+    <p id="panel-message" class="message" role="alert" hidden></p>
+
+    <div class="panel-actions">
+      <button id="btn-start" type="button" class="primary">Start session</button>
+      <button id="btn-complete" type="button"></button>
+    </div>
+
+    <details class="past">
+      <summary>Add a past session</summary>
+      <form id="past-form">
+        <label>Started <input id="past-start" type="datetime-local" required></label>
+        <label>Stopped <input id="past-end" type="datetime-local" required></label>
+        <label>Minutes paused <input id="past-paused" type="number" min="0" step="1" value="0"></label>
+        <button type="submit">Add session</button>
+      </form>
+    </details>
+  </dialog>
+
+  <!-- Settings -->
+  <dialog id="settings" class="panel">
+    <header class="panel-head">
+      <h2>Settings</h2>
+      <button id="settings-close" type="button" class="quiet" aria-label="Close">&times;</button>
+    </header>
+    <form id="settings-form" class="form">
+      <label>Course name
+        <input id="set-name" type="text" maxlength="60" required>
+      </label>
+      <label>Course start date
+        <input id="set-start" type="date" required>
+        <span class="hint">Used for "days since start" and the finish-date estimate.</span>
+      </label>
+      <label>Minimum session length (minutes)
+        <input id="set-min" type="number" min="1" max="180" step="1" required>
+        <span class="hint">A session shorter than this can't be saved, and a day needs this many minutes to count toward your streak.</span>
+      </label>
+      <label>Theme
+        <select id="set-theme">
+          <option value="system">Match Windows</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="ocean">Ocean (light blue)</option>
+          <option value="forest">Forest (dark green)</option>
+          <option value="sunset">Sunset (warm light)</option>
+          <option value="contrast">High contrast (dark)</option>
+        </select>
+        <span class="hint">Picking a theme previews it right away. Save to keep it.</span>
+      </label>
+      <p id="settings-message" class="message" role="alert" hidden></p>
+      <p id="settings-saved" class="saved" hidden>Saved.</p>
+      <button type="submit" class="primary">Save settings</button>
+    </form>
+
+    <h3>Your data</h3>
+    <p class="hint">Everything is stored on this PC only, in <span id="data-folder"></span>.</p>
+    <div class="panel-actions">
+      <a class="button" href="/api/export.csv" download>Export sessions (CSV)</a>
+      <a class="button" href="/api/backup" download>Back up my data</a>
+    </div>
+    <div class="danger-zone">
+      <p><strong>Start over.</strong> Erases every session and un-checks every day. Your settings stay. This can't be undone, so make a backup first.</p>
+      <div class="panel-actions">
+        <input id="reset-confirm" type="text" placeholder='Type RESET to enable' autocomplete="off">
+        <button id="btn-reset" type="button" class="danger" disabled>Erase everything</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Help -->
+  <dialog id="help" class="panel">
+    <header class="panel-head">
+      <h2>Help</h2>
+      <button id="help-close" type="button" class="quiet" aria-label="Close">&times;</button>
+    </header>
+
+    <details open>
+      <summary>Getting started</summary>
+      <ol>
+        <li>Click the course day you're working on (the numbers on the grid).</li>
+        <li>Click <strong>Start session</strong>. A timer appears at the top.</li>
+        <li>When you're done, click <strong>Stop</strong>. The time is saved.</li>
+        <li>Finished the whole day? Open it and click <strong>Mark complete</strong>.</li>
+      </ol>
+      <p>You can close the app while a session is running; the timer keeps counting from the real clock when you come back.</p>
+    </details>
+
+    <details>
+      <summary>Pausing, and the minimum session</summary>
+      <p><strong>Pause</strong> for interruptions. Paused time isn't counted. <strong>Resume</strong> carries on.</p>
+      <p>A session must have at least the minimum active time (20 minutes unless you changed it in Settings). If you click Stop too early, the session keeps running; keep going, or <strong>Discard</strong> it.</p>
+      <p>You can do several sessions in one calendar day, even for different course days. Each session belongs to exactly one course day.</p>
+    </details>
+
+    <details>
+      <summary>I forgot to press Start</summary>
+      <p>Open the day and use <strong>Add a past session</strong>. Enter when you started and stopped, and how many minutes you paused. A past session can't overlap another one or end in the future.</p>
+    </details>
+
+    <details>
+      <summary>What the stats mean</summary>
+      <ul>
+        <li><strong>Hours logged:</strong> all active time in saved sessions.</li>
+        <li><strong>Real days per course day:</strong> days since your start date divided by course days completed. It's your pace.</li>
+        <li><strong>Projected finish:</strong> today plus (course days left &times; your pace). It moves as your pace changes.</li>
+        <li><strong>Current streak:</strong> calendar days in a row with at least the minimum minutes. If you haven't studied yet today, yesterday's streak still shows.</li>
+        <li><strong>Longest streak:</strong> your best run so far.</li>
+        <li><strong>Most time-consuming day:</strong> the course day you've spent the most minutes on.</li>
+      </ul>
+    </details>
+
+    <details>
+      <summary>Where is my data? Backups and moving PCs</summary>
+      <p>Everything lives in one file, <span id="help-db"></span>. Nothing is sent over the internet.</p>
+      <p><strong>Back up:</strong> Settings &rarr; <em>Back up my data</em>, or just copy that file.</p>
+      <p><strong>Restore or move to a new PC:</strong> close the app, then put the backup file in the data folder named <code>tracker.db</code> (replace the old one).</p>
+      <p><strong>Uninstalling</strong> the app doesn't delete your data folder.</p>
+    </details>
+
+    <details>
+      <summary>About</summary>
+      <p>100 Days Tracker <span id="help-version"></span>. This app tracks the course
+        <a id="help-course" href="#" target="_blank" rel="noopener"></a>, one numbered day per day of the class.</p>
+      <p class="hint">An independent, unofficial project. "100 Days of Code" is a trademark of its owner. This app is not affiliated with or endorsed by Udemy, the course's instructor, or the trademark owner, and contains no course content.</p>
+    </details>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

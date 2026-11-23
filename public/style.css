@@ -1,0 +1,259 @@
+/* Poster look: 7 columns x 15 rows, numbers running DOWN each column.
+
+   Colors are variables. A theme is just a different set of values, chosen by
+   <html data-theme="...">. With no data-theme ("Match Windows"), the dark set
+   applies when Windows is in dark mode. */
+
+:root {
+  --bg: #ffffff;
+  --text: #1c2030;
+  --muted: #6b7185;
+  --square: #e3e5ea;
+  --number: #5a6aa6;
+  --done: #3c9d5d;
+  --done-text: #ffffff;
+  --progress: #f2b84b;
+  --running: #4a7bd8;
+  --line: #d4d7de;
+  --accent: #4a7bd8;
+  --accent-text: #ffffff;
+  --danger: #b3382c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #14161d;
+    --text: #e8eaf2;
+    --muted: #9aa0b5;
+    --square: #2a2e3b;
+    --number: #8d9bd6;
+    --done: #2f8650;
+    --progress: #c8962f;
+    --line: #333849;
+    --danger: #e5766a;
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #14161d;
+  --text: #e8eaf2;
+  --muted: #9aa0b5;
+  --square: #2a2e3b;
+  --number: #8d9bd6;
+  --done: #2f8650;
+  --progress: #c8962f;
+  --line: #333849;
+  --danger: #e5766a;
+}
+
+:root[data-theme="ocean"] {
+  color-scheme: light;
+  --bg: #eef6fb;
+  --text: #10303f;
+  --muted: #5a7a8a;
+  --square: #d3e6f0;
+  --number: #2a6f97;
+  --done: #1f8a8a;
+  --progress: #f0b44c;
+  --running: #1b6ca8;
+  --line: #b8d3e2;
+  --accent: #1b6ca8;
+  --danger: #b3382c;
+}
+
+:root[data-theme="forest"] {
+  color-scheme: dark;
+  --bg: #101a14;
+  --text: #e3efe6;
+  --muted: #8fa898;
+  --square: #1d2c23;
+  --number: #8fc9a0;
+  --done: #3f9a5f;
+  --progress: #c9a23a;
+  --running: #5cb88a;
+  --line: #2b4033;
+  --accent: #3f9a5f;
+  --danger: #e5766a;
+}
+
+:root[data-theme="sunset"] {
+  color-scheme: light;
+  --bg: #fff6ee;
+  --text: #3b2418;
+  --muted: #8a6a58;
+  --square: #f5dfcf;
+  --number: #b5562a;
+  --done: #c4552b;
+  --progress: #f2c14e;
+  --running: #7a4bb8;
+  --line: #ebcfba;
+  --accent: #c4552b;
+  --danger: #a8231f;
+}
+
+:root[data-theme="contrast"] {
+  color-scheme: dark;
+  --bg: #000000;
+  --text: #ffffff;
+  --muted: #d0d0d0;
+  --square: #1a1a1a;
+  --number: #ffe600;
+  --done: #00c853;
+  --done-text: #000000;
+  --progress: #ffb300;
+  --running: #00b0ff;
+  --line: #ffffff;
+  --accent: #00b0ff;
+  --accent-text: #000000;
+  --danger: #ff8a80;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0 auto;
+  padding: 16px;
+  max-width: 640px;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.4 system-ui, "Segoe UI", sans-serif;
+}
+
+h1 { margin: 0 0 4px; font-size: 1.4rem; }
+h2 { margin: 0; font-size: 1.1rem; }
+h3 { margin: 20px 0 4px; font-size: 1rem; }
+a { color: var(--accent); }
+
+.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.top-buttons { display: flex; gap: 4px; }
+.summary { margin: 0 0 12px; color: var(--muted); }
+
+button, a.button {
+  font: inherit;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--square);
+  color: var(--text);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+button.quiet { background: transparent; }
+button.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button[hidden] { display: none; }
+button:focus-visible, a.button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --- the grid -------------------------------------------------------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(15, auto);
+  grid-auto-flow: column;
+  gap: 4px;
+}
+
+.day {
+  aspect-ratio: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-weight: 600;
+  font-size: 0.85rem;
+  line-height: 1.1;
+  background: var(--square);
+  color: var(--number);
+  border: 2px solid transparent;
+  border-radius: 6px;
+}
+.day.done { background: var(--done); color: var(--done-text); }
+.day.progress { background: var(--progress); color: #1c2030; }
+.day.running { border-color: var(--running); box-shadow: 0 0 0 2px var(--running); }
+.day .check { font-size: 0.7rem; }
+
+/* --- running-session banner ------------------------------------------ */
+
+.banner {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: 0 -16px 12px;
+  padding: 10px 16px;
+  background: var(--bg);
+  border-bottom: 2px solid var(--running);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+}
+.banner[hidden] { display: none; }
+.banner-info { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.timer { font-size: 1.5rem; font-variant-numeric: tabular-nums; font-weight: 700; }
+.note { color: var(--muted); font-size: 0.9rem; }
+.banner-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.message { margin: 0 0 12px; padding: 8px 12px; border-radius: 8px; color: var(--danger); border: 1px solid var(--danger); }
+.message[hidden] { display: none; }
+.saved { margin: 0 0 8px; color: var(--done); font-weight: 600; }
+.saved[hidden] { display: none; }
+
+/* --- stats ----------------------------------------------------------- */
+
+.stats { margin-top: 20px; }
+.stats[hidden] { display: none; }
+.stats dl { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; margin: 8px 0 0; }
+.stats dt { color: var(--muted); }
+.stats dd { margin: 0; font-weight: 600; text-align: right; }
+
+/* --- dialogs (day, settings, help) ----------------------------------- */
+
+.panel {
+  width: min(92vw, 520px);
+  max-height: 88vh;
+  padding: 16px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.panel::backdrop { background: rgba(0, 0, 0, 0.5); }
+.panel-head { display: flex; justify-content: space-between; align-items: center; }
+.sessions { list-style: none; margin: 8px 0; padding: 0; }
+.sessions li { padding: 8px 0; border-top: 1px solid var(--line); }
+.sessions .when { display: block; }
+.sessions .detail { color: var(--muted); font-size: 0.9rem; }
+.panel-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
+.past { margin-top: 12px; }
+.past summary, .panel details summary { cursor: pointer; }
+.past summary { color: var(--muted); }
+.past form, .form { display: grid; gap: 10px; margin-top: 8px; }
+.past label, .form label { display: grid; gap: 2px; color: var(--muted); font-size: 0.9rem; }
+.hint { color: var(--muted); font-size: 0.85rem; }
+input, select {
+  font: inherit;
+  padding: 6px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.danger-zone { margin-top: 16px; padding: 12px; border: 1px solid var(--danger); border-radius: 8px; }
+.danger-zone p { margin: 0; }
+
+.panel details { border-top: 1px solid var(--line); padding: 8px 0; }
+.panel details p, .panel details ol, .panel details ul { margin: 6px 0; }
+.panel code { background: var(--square); padding: 1px 4px; border-radius: 4px; }
